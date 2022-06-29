@@ -1,0 +1,90 @@
+﻿@model MVCManukauTech.ViewModels.CatalogViewModel
+
+@* YLA 28/04/20 Necessary injections needed to check if user is logged in and/or has a role *@
+
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<MVCManukauTech.Areas.Identity.Data.MVCManukauTechUser> signInManager;
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+@* CRC 17/3/20 Moderate details of selected product. CSS and Bootstrap would be useful *@
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <br />
+                <img src="~/images/products/@Model.ImageFileName" width="313" height="464">
+            </div>
+            <div class="col-md-6">
+                <h1>@Model.Name</h1>
+                <p class="price">$@Model.UnitCost</p>
+                @*CRC 31.03.20 add HTML.Raw to clear HTML tags*@
+                <p>@Html.Raw(Model.Description)</p>
+                <p>Category:&nbsp;@Model.CategoryName</p>
+                <br /><br /><br />
+
+                <p>
+                   <a class="btn btn-primary" href="~/OrderDetails/ShoppingCart?ProductId=@Model.ProductId">Add To Cart</a>
+                      @if (User.IsInRole("Admin"))
+                        {
+                         <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.ProductId">Edit</a>
+                        }
+                       <a class="btn btn-primary" asp-controller="Catalog" asp-action="Index">Back to List</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+
+@*<ul class="w3-ul w3-card-4">
+    <li class="w3-bar">
+
+        <div class="w3-bar-item">
+            <img src="~/images/products/@Model.ImageFileName"><br><br><br>
+            <span class="w3-large">Name:&nbsp;&nbsp;@Model.Name</span><br><br><br>
+            <span class="w3-medium">Unit Cost:&nbsp;&nbsp;@Model.UnitCost</span><br><br>
+            <span class="w3-medium">Description:&nbsp;&nbsp;@Model.Description</span><br><br>
+            <span class="w3-medium">Category:&nbsp;&nbsp;@Model.CategoryName</span><br><br>
+        </div>
+
+    <a asp-action="Edit" asp-route-id="@Model.ProductId">Edit</a><br />
+    <a asp-controller="Catalog" asp-action="Index">Back to List</a>
+    </li>
+    </ul>*@
+
+@* CRC 13/3/20 old code, commented out *@
+
+@*<div>
+        <hr />
+        <ul style="list-style-type: none">
+            <li>
+                Name:&nbsp;&nbsp;@Model.Name
+                <br />
+            </li>
+            <li>
+                <br />
+                <img src="~/images/products/@Model.ImageFileName" />
+                <br />
+            </li>
+            <li>
+                <br />
+                Unit Cost:&nbsp;&nbsp;$@Model.UnitCost
+                <br />
+            </li>
+            <li>
+                <br />
+                Description:&nbsp;&nbsp;@Model.Description
+                <br />
+            </li>
+            <li>
+                <br />
+                Category:&nbsp;&nbsp;@Model.CategoryName
+                <br />
+            </li>
+        </ul>
+    </div>*@
+

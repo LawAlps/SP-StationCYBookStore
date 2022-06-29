@@ -1,0 +1,81 @@
+﻿@model MVCManukauTech.Models.DB.Product
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+@*ref: https://www.tiny.cloud/docs/configure/content-appearance/*@
+<script src="~/js/tinymce/tinymce.min.js"></script>
+<script>
+    //Uncomment the next line to check for virtual directory support
+    //alert("css location = " + window.location.pathname + "/../../../css/site.css");
+    tinymce.init({
+        selector: "textarea",
+        plugins: "link lists table image",
+        content_css: window.location.pathname + "/../../../css/site.css"
+        //content_css: "/css/site.css"
+    });
+</script>
+
+
+<h1>Edit</h1>
+
+<h4>Product</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ProductId" />
+            <div class="form-group">
+                <label asp-for="CategoryId" class="control-label"></label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImageFileName" class="control-label"></label>
+                <input asp-for="ImageFileName" class="form-control" src="~/images/products/@Model.ImageFileName" />
+                <span asp-validation-for="ImageFileName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UnitCost" class="control-label"></label>
+                <input asp-for="UnitCost" class="form-control" />
+                <span asp-validation-for="UnitCost" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                @*textarea is the target that tinyMCE modifies using javascript referenced above*@
+                @*<textarea asp-for="Description" class="form-control"></textarea>*@
+                <textarea id="Description" name="Description" class="form-control">@Html.Raw(Model.Description)</textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            @*<div class="form-group">
+                    <label asp-for="IsDownload" class="control-label"></label>
+                    <input asp-for="IsDownload" class="form-control" />
+                    <span asp-validation-for="IsDownload" class="text-danger"></span>
+                </div>*@
+            @*<div class="form-group">
+                    <label asp-for="DownloadFileName" class="control-label"></label>
+                    <input asp-for="DownloadFileName" class="form-control" />
+                    <span asp-validation-for="DownloadFileName" class="text-danger"></span>
+                </div>*@
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+
+    <a asp-controller="Catalog" asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

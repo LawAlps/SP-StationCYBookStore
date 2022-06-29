@@ -1,0 +1,166 @@
+﻿@model MVCManukauTech.ViewModels.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+@* CRC 26/04/2020 add paypal buttons to checkout page *@
+<script src="https://www.paypal.com/sdk/js?client-id=AX9Eb6tkMzxm9_1syAfw0yH_ada9bzH8ekVs6g3yd5l_mzTLkkaoQGF4kv90ZbP0iCf0Pv13K1KkH6YO">
+    // Required. Replace SB_CLIENT_ID with your sandbox client ID.
+</script>
+
+@* CRC 26/04/2020 display message about payment transaction *@
+<script>
+    alert("Transaction must be done by paypal");
+</script>
+
+<script type="text/javascript">
+    function XTest() {
+        document.getElementById("CustomerName").value = "Mr Tester";
+        document.getElementById("AddressStreet").value = "555 Imaginary Rd";
+        document.getElementById("Location").value = "Henderson";
+        document.getElementById("Country").value = "New Zealand";
+        document.getElementById("PostCode").value = "0612";
+        document.getElementById("CardOwner").value = "Mr Tester";
+        document.getElementById("CardType").value = "Visa";
+        document.getElementById("CardNumber").value = "1111";
+        document.getElementById("CSC").value = "111";
+    }
+</script>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Checkout</h4>
+
+        <hr />
+        @Html.ValidationSummary(true)
+
+
+        <div class="form-group">
+            <label for="CustomerName" class="control-label col-md-2" style="display:inline">Customer Name:</label>
+            <div class="col-md-10">
+                <input type="text" id="CustomerName" name="CustomerName" value="@Model.CustomerName" style="display:inline" />
+                <input type="button" value="Test Data" onclick="XTest();" class="btn" style="display:inline" />
+                @Html.ValidationMessageFor(model => model.CustomerName)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="AddressStreet" class="control-label col-md-2">Street Address:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.AddressStreet)
+                @Html.ValidationMessageFor(model => model.AddressStreet)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Location" class="control-label col-md-2">City or Location:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Location)
+                @Html.ValidationMessageFor(model => model.Location)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Country" class="control-label col-md-2">Country:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Country)
+                @Html.ValidationMessageFor(model => model.Country)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="PostCode" class="control-label col-md-2">Post Code:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.PostCode)
+                @Html.ValidationMessageFor(model => model.PostCode)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="CardOwner" class="control-label col-md-2">Card Owner:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CardOwner)
+                @Html.ValidationMessageFor(model => model.CardOwner)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="CardType" class="control-label col-md-2">Card Type:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CardType)
+                @Html.ValidationMessageFor(model => model.CardType)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="CardNumber" class="control-label col-md-2">Card Number:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CardNumber)
+                @Html.ValidationMessageFor(model => model.CardNumber)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="CSC" class="control-label col-md-2">CSC:</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CSC)
+                @Html.ValidationMessageFor(model => model.CSC)
+            </div>
+        </div>
+
+        @* CRC 26/04/2020 give the Grand Total value any number for price testing *@
+        <input id="GrandTotal" type="hidden" value="137.00" />
+
+        @* Old code, commented out *@
+
+        @*<div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Submit" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>*@
+
+        @* CRC 29/04/2020 replace payment invoice with paypal *@
+        <br />
+        <h3>Payment Options</h3><br />
+        <div id="paypal-button-container"></div>
+
+        @* CRC 29/04/2020 set up paypal transaction *@
+        <script>
+        paypal.Buttons({
+            createOrder: function (data, actions) {
+                // This function sets up the details of the transaction, including the amount and line item details.
+                var grandTotal = parseFloat(document.getElementById("GrandTotal").value).toFixed(2).toString();
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: grandTotal
+                        }
+                    }]
+                });
+            },@* CRC 29/04/2020 inform the user that the transaction is done successfully *@
+            onApprove: function(data, actions) {
+                // This function captures the funds from the transaction.
+                    return actions.order.capture().then(function(details) {
+                    // This function shows a transaction success message to your buyer.
+                    alert('Transaction completed by ' + details.payer.name.given_name);
+                    });
+                }
+            }).render('#paypal-button-container');
+        </script>
+    </div>
+
+}
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@*@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    }*@

@@ -1,0 +1,152 @@
+﻿@model ReflectionIT.Mvc.Paging.PagingList<MVCManukauTech.Models.DB.Product>
+@using ReflectionIT.Mvc.Paging
+@addTagHelper *, ReflectionIT.Mvc.Paging
+
+@{
+    if (ViewBag.CategoryName == null)
+    {
+        ViewBag.Title = "Catalog";
+    }
+    else
+    {
+        ViewBag.Title = "Catalog - " + ViewBag.CategoryName;
+    }
+}
+
+    <h3>@ViewBag.Title</h3>
+
+        @* CLIENT SIDE added near top of Views/Products/Index.cshtml *@
+
+        @*20170314 JPC CLIENT SIDE add search as mini-form - note the use of GET for a small input
+        into a page that has multiple purposes*@
+        @*20180816 JPC note that the browser adds its own "autocomplete" suggestions.
+        Fix with autocomplete="off" - Ref: https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Turning_off_form_autocompletion*@
+        <form id="searchForm" action="/Products/Index" method="get" autocomplete="off">
+            <p>
+                Search Products:
+                <div>
+                    <input type="text" id="searchString" name="searchString"
+                           autocomplete="off" onkeyup="XAjaxRequest(this.value);"
+                           style="width: 180px" />
+                    <input type="submit" value="Submit" />
+                    <br />
+                    <div id="autoSuggestContainer" style="position:absolute;display:none;z-index:100;">
+
+                    </div>
+                </div>
+
+            </p>
+        </form>
+
+        <script type="text/javascript">
+            function XAjaxRequest(searchString) {
+                if (searchString.length < 3) {
+                    //on deleting input to enter something else, needs clear
+                    document.getElementById("autoSuggestContainer").innerHTML = "";
+                    return;
+                }
+                //alert("testing searchString=" + searchString);
+                var xmlhttp;
+                xmlhttp = new XMLHttpRequest();
+                var url = "/Products/IndexAJAX?searchString=" + searchString;
+                xmlhttp.open("GET", url, false);
+                xmlhttp.send();
+                document.getElementById("autoSuggestContainer").style.display = "block";
+                //CRC 17.03.20 clear duplicates of search results
+                document.getElementById("autoSuggestContainer").innerHTML = "";
+                var messageObject = JSON.parse(xmlhttp.responseText);
+
+                //var autoSuggestions = "";
+
+                for (var i = 0; i < messageObject.length; i++) {
+                    //HTML Code generation demo
+                    //autoSuggestions += "<input type=\"button\" value=\"" + messageObject[i].ProductName + "\" " + "onclick=\"document.getElementById('searchString').value = this.value; document.getElementById('searchForm').submit();\" style=\"width: 280px\" />";
+                    //autoSuggestions += "<br />"
+
+                    //object-oriented approach to generating on-screen elements with an example result on the next line
+
+                    var b = document.createElement("INPUT");
+                    var t = document.createAttribute("type");
+                    t.value = "button";
+                    b.setAttributeNode(t);
+                    var v = document.createAttribute("value");
+                    v.value = messageObject[i].Name;
+                    b.setAttributeNode(v);
+                    var o = document.createAttribute("onclick");
+                    o.value = "document.getElementById('searchString').value = this.value; document.getElementById('searchForm').submit();";
+                    b.setAttributeNode(o);
+                    var s = document.createAttribute("style");
+                    s.value = "width: 280px";
+                    b.setAttributeNode(s);
+                    document.getElementById("autoSuggestContainer").appendChild(b);
+                    //end button
+                    //start <br />
+                    var br = document.createElement("BR");
+                    document.getElementById("autoSuggestContainer").appendChild(br);
+                }
+
+                //place the generated buttons HTML code inside the display div
+                //document.getElementById("autoSuggestContainer").innerHTML = autoSuggestions;
+
+            }
+        </script>
+        @* Moderate products table and page links by adding a bit of css *@
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        
+        <br />
+        @*<nav aria-label="Products Paging">
+            @await this.Component.InvokeAsync("Pager", new { pagingList = this.Model })
+        </nav>
+        <br />*@
+
+        <body>
+            @* CRC 30/3/20 improve product item layout *@
+            <div class="container">             
+                <div class="row">
+                    @foreach (var item in Model)
+                    {
+                        <center>
+                            <div style="width:350px">
+                                <img class="card-img-top" src="~/images/products/@item.ImageFileName" style="width: 206px" height="316" />
+                                <div class="card-body">
+                                    <h4 class="card-title">@item.Name</h4>
+                                    <p class="card-text">Price: $@item.UnitCost</p>
+                                    <p style="font-size: 10pt">Category: @item.Category.CategoryName</p>
+                                    @*<p style="font-size: 10pt">Description: @item.Description</p>*@
+                                    <p>
+                                        <a class="w3-btn w3-block w3-gray" href="~/OrderDetails/ShoppingCart?ProductId=@item.ProductId">Add&nbsp;to&nbsp;Cart</a>
+                                        <a class="w3-btn w3-block w3-light-gray" href="~/Catalog/Details?ProductId=@item.ProductId">Details</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </center>
+
+
+                        @*Old code, commented out
+
+                <div class="col-md-4">
+                    <center>
+                        <img src="~/images/products/@item.ImageFileName" style="width: 176px" height="260" />&nbsp;&nbsp;<br />
+                        <p style="font-size: 10pt">@item.Name</p>
+                        <p style="font-size: 10pt" class="price">Price: $@item.UnitCost</p>
+                        <p style="font-size: 10pt">Description: @item.Description</p>
+                        <p style="font-size: 10pt">Category: @item.Category.CategoryName</p>
+                        <p>
+                            <button ><a href="~/OrderDetails/ShoppingCart?ProductId=@item.ProductId">Add&nbsp;to&nbsp;Cart</a></button>&nbsp;
+                            <button><a href="~/Catalog/Details?ProductId=@item.ProductId">Details</a></button>
+                        </p>
+                    </center>
+                </div>*@
+                    }
+                </div>
+            </div>
+            <br />
+
+            @* CRC 29/3/20 for number of pages to appear, with maximum of items to be displayed *@
+            <nav aria-label="Products navigation example">
+                <vc:pager paging-list="@Model" />
+            </nav>
+        </body>
+
+
+

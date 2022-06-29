@@ -1,0 +1,62 @@
+﻿
+@{
+    ViewData["Title"] = "MembershipType";
+}
+
+    <header>
+        <h1>Membership Subscriptions</h1>
+        <h3>All memberships last a year.</h3>
+    </header>
+<html lang="en">
+<body>
+    <section>
+        <div class="wrapper">
+            <article>
+                <h1>Bronze</h1>
+                <p>
+                    <div style="float:left">
+                        Bronze membership gives you a 6% discount in our store.
+                    </div>
+                </p>
+                <a class="btn btn-primary" asp-action="MembershipChange" asp-controller="Memberships" asp-route-id="24d9b907-10ed-49e2-af99-7039865b7aa7" style="float: right;">Buy</a>
+            </article>
+        </div>
+    </section>
+    <br /> <br /> <br />
+    <section>
+        <div class="wrapper">
+            <article>
+                <h1>Silver</h1>
+                <p>
+                    <div style="float:left">
+                        Silver membership gives you a 9% discount in our store.
+                    </div>
+                </p>
+                <a class="btn btn-primary" asp-action="MembershipChange" asp-controller="Memberships" asp-route-id="a230e123-92db-44c7-8fef-517b456b7762" style="float: right;">Buy</a>
+            </article>
+        </div>
+    </section>
+    <br /> <br /> <br />
+    <section>
+        <div class="wrapper">
+            <article>
+                <h1>Gold</h1>
+                <p>
+                    <div style="float:left">
+                        Gold membership gives you a 14% discount in our store.
+                    </div>
+                </p>
+                <a class="btn btn-primary" asp-action="MembershipChange" asp-controller="Memberships" asp-route-id="c5014b9f-9f60-4b82-8755-59af9aba9dea" style="float: right;">Buy</a>
+            </article>
+        </div>
+    </section>
+
+     @*Test to check if viewbag grabbed current user ID. Uncomment out code to check*@
+        @*<p>
+            @userid
+        </p>*@ 
+    <footer>
+    </footer>
+
+</body>
+</html>

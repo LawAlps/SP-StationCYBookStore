@@ -1,0 +1,153 @@
+﻿@*@model IEnumerable<MVCManukauTech.Models.DB.Product>*@
+@model IEnumerable<MVCManukauTech.Models.DB.Product>
+
+@{
+    //Are we showing all the products or only one category?
+    if (ViewBag.CategoryName == null)
+    {
+        ViewBag.Title = "Product";
+    }
+    else
+    {
+        ViewBag.Title = "Product - " + ViewBag.Name;
+    }
+}
+
+<h2>@ViewBag.Title</h2>
+
+@* CLIENT SIDE added near top of Views/Products/Index.cshtml *@
+
+@*20170314 JPC CLIENT SIDE add search as mini-form - note the use of GET for a small input
+    into a page that has multiple purposes*@
+@*20180816 JPC note that the browser adds its own "autocomplete" suggestions.
+    Fix with autocomplete="off" - Ref: https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Turning_off_form_autocompletion*@
+<form id="searchForm" action="/Products/Index" method="get" autocomplete="off">
+    <p>
+        Search Products:
+        <div>
+            <input type="text" id="searchString" name="searchString"
+                   autocomplete="off" onkeyup="XAjaxRequest(this.value);"
+                   style="width: 180px" />
+            <input type="submit" value="Submit" />
+            <br />
+            <div id="autoSuggestContainer" style="position:absolute;display:none;z-index:100;">
+
+            </div>
+        </div>
+
+    </p>
+</form>
+
+<script type="text/javascript">
+    function XAjaxRequest(searchString) {
+        if (searchString.length < 3) {
+            //on deleting input to enter something else, needs clear
+            document.getElementById("autoSuggestContainer").innerHTML = "";
+            return;
+        }
+        //alert("testing searchString=" + searchString);
+        var xmlhttp;
+        xmlhttp = new XMLHttpRequest();
+        var url = "/Products/IndexAJAX?searchString=" + searchString;
+        xmlhttp.open("GET", url, false);
+        xmlhttp.send();
+        document.getElementById("autoSuggestContainer").style.display = "block";
+        document.getElementById("autoSuggestContainer").innerHTML = "";
+        var messageObject = JSON.parse(xmlhttp.responseText);
+
+        //var autoSuggestions = "";
+
+        for (var i = 0; i < messageObject.length; i++) {
+            //HTML Code generation demo
+            //autoSuggestions += "<input type=\"button\" value=\"" + messageObject[i].ProductName + "\" " + "onclick=\"document.getElementById('searchString').value = this.value; document.getElementById('searchForm').submit();\" style=\"width: 280px\" />";
+            //autoSuggestions += "<br />"
+
+            //object-oriented approach to generating on-screen elements with an example result on the next line
+
+            var b = document.createElement("INPUT");
+            var t = document.createAttribute("type");
+            t.value = "button";
+            b.setAttributeNode(t);
+            var v = document.createAttribute("value");
+            v.value = messageObject[i].Name;
+            b.setAttributeNode(v);
+            var o = document.createAttribute("onclick");
+            o.value = "document.getElementById('searchString').value = this.value; document.getElementById('searchForm').submit();";
+            b.setAttributeNode(o);
+            var s = document.createAttribute("style");
+            s.value = "width: 280px";
+            b.setAttributeNode(s);
+            document.getElementById("autoSuggestContainer").appendChild(b);
+            //end button
+            //start <br />
+            var br = document.createElement("BR");
+            document.getElementById("autoSuggestContainer").appendChild(br);
+        }
+
+        //place the generated buttons HTML code inside the display div
+        //document.getElementById("autoSuggestContainer").innerHTML = autoSuggestions;
+
+    }
+</script>
+
+
+<table class="table-borderless">
+    <tr>
+        <td>
+            Name
+        </td>
+        <td>
+            Image
+        </td>
+        <td>
+            Unit Cost
+        </td>
+        <td>
+            Description
+        </td>
+        <td>
+            Category
+        </td>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                <br />
+                @item.Name
+                <br />
+            </td>
+            <td>
+                <br />
+                <img src="~/images/products/@item.ImageFileName" style="width:100px" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <br />
+            </td>
+            <td>
+                <br />
+                $@item.UnitCost&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <br />
+            </td>
+            <td>
+                <br />
+                @Html.Raw(item.Description)
+                <br />
+            </td>
+            <td>
+                <br />
+                @item.Category
+                <br />
+            </td>
+            <td>
+                <a href="~/OrderDetails/ShoppingCart?ProductId=@item.ProductId"><button>Add&nbsp;to&nbsp;Cart</button>&nbsp;&nbsp;&nbsp;&nbsp;</a>
+            </td>&nbsp;&nbsp;
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ProductId"><button>Edit</button>&nbsp;&nbsp;&nbsp;&nbsp;</a>
+            </td>&nbsp;&nbsp;
+            <td>
+                <a href="~/Catalog/Details?ProductId=@item.ProductId"><button>Details</button>&nbsp;&nbsp;&nbsp;&nbsp;</a>
+            </td>&nbsp;&nbsp;
+        </tr>
+    }
+
+</table>
